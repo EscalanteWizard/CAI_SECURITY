@@ -1,0 +1,26 @@
+GUION CORTO PARA PRESENTAR EL PROTOTIPO
+
+"Para la etapa de prototipo desarrollamos una simulación de la plataforma de
+CAI Security, la empresa de seguridad tecnológica de nuestro proyecto.
+
+Desde el panel principal el usuario puede revisar el estado de sus cámaras,
+sensores de barrera láser y el sistema de reconocimiento facial. Para representar
+el funcionamiento de la inteligencia artificial, el prototipo permite simular la
+detección de un movimiento sospechoso, un corte en un sensor láser o la
+identificación de un rostro.
+
+Cuando esto ocurre, el sistema genera una alerta indicando dónde ocurrió el
+evento y su nivel de riesgo. A partir de ahí, el usuario puede revisar la cámara,
+contactar al servicio de vigilancia, marcar el evento como una falsa alarma o
+activar el módulo conceptual de contramedidas de disuasión no letal, que en el
+prototipo es completamente ficticio.
+
+También incluimos un cambio de tema claro/oscuro para mostrar cómo se adapta la
+interfaz a la identidad visual de CAI Security y a la preferencia del usuario.
+
+La idea es que, en el producto final, esta retroalimentación también pueda ayudar
+al sistema a mejorar futuras detecciones.
+
+Este prototipo no utiliza cámaras, sensores, inteligencia artificial ni sustancias
+reales, porque su objetivo es mostrar y probar la experiencia del usuario antes de
+desarrollar el producto completo."
