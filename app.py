@@ -78,16 +78,30 @@ html, body, [class*="css"] {{ font-family: 'Inter', sans-serif; }}
 [data-testid="stSidebar"] label, [data-testid="stSidebar"] p,
 [data-testid="stSidebar"] span, [data-testid="stSidebar"] div {{ color: {c['text']}; }}
 
-[data-testid="stSidebar"] [data-testid="stImage"] {{
-    display: flex; justify-content: center; margin: 6px 0 14px 0;
+.sidebar-logo {{ text-align: left; line-height: 1; margin: 10px 0 24px 4px; }}
+.sidebar-logo-main {{
+    font-size: 96px; font-weight: 800; letter-spacing: 0.01em; color: {c['text']}; white-space: nowrap;
 }}
-[data-testid="stSidebar"] [data-testid="stImage"] img {{
-    border-radius: 10px;
+.sidebar-logo-sub {{
+    font-size: 34px; font-weight: 700; letter-spacing: 0.14em;
+    margin-top: 4px; color: {c['text']}; white-space: nowrap;
+}}
+
+[data-testid="stExpandSidebarButton"],
+[data-testid="stSidebarCollapseButton"] button {{
+    background-color: {c['accent']} !important;
+    border-radius: 8px !important;
+    min-width: 44px !important; min-height: 44px !important;
+}}
+[data-testid="stExpandSidebarButton"] [data-testid="stIconMaterial"],
+[data-testid="stSidebarCollapseButton"] [data-testid="stIconMaterial"] {{
+    color: #062226 !important;
 }}
 
 h1, h2, h3, h4, p, span, li, label {{ color: {c['text']}; }}
 
 .main-title {{ font-size: 42px; font-weight: 800; margin-bottom: 0px; color: {c['text']}; }}
+.brand-accent {{ color: {c['accent']} !important; }}
 .subtitle {{ font-size: 17px; color: {c['subtext']}; margin-top: 0px; }}
 
 .card {{
@@ -129,9 +143,41 @@ h1, h2, h3, h4, p, span, li, label {{ color: {c['text']}; }}
 .stButton > button:active {{ transform: translateY(0px); }}
 .stButton > button:disabled {{ background-color: {c['card_border']}; color: {c['subtext']}; }}
 
+[data-testid="stTabs"] div[role="tablist"] {{
+    overflow-x: auto; -webkit-overflow-scrolling: touch; flex-wrap: nowrap; gap: 4px;
+}}
+[data-testid="stTab"] {{
+    font-size: 14px; padding: 8px 12px; white-space: nowrap;
+}}
+[data-testid="stTab"] p {{ font-size: 14px; }}
+[data-testid="stTab"][aria-selected="true"] p {{
+    color: {c['accent']} !important; font-weight: 700;
+}}
+[data-testid="stTab"] .react-aria-SelectionIndicator {{
+    background-color: {c['accent']} !important;
+}}
+[data-testid="stTabsScrollRight"] {{
+    background-color: {c['bg']} !important;
+    background-image: linear-gradient(to right, transparent, {c['bg']} 40%) !important;
+    color: {c['text']} !important;
+}}
+[data-testid="stTabsScrollLeft"] {{
+    background-color: {c['bg']} !important;
+    background-image: linear-gradient(to left, transparent, {c['bg']} 40%) !important;
+    color: {c['text']} !important;
+}}
+
 hr {{ border-color: {c['card_border']}; }}
 ::-webkit-scrollbar {{ width: 10px; }}
 ::-webkit-scrollbar-thumb {{ background-color: {c['card_border']}; border-radius: 10px; }}
+
+@media (max-width: 640px) {{
+    .main-title {{ font-size: 28px; }}
+    .subtitle {{ font-size: 14px; }}
+    .card, .camera-box {{ padding: 12px 14px; }}
+    [data-testid="stMetric"] {{ padding: 10px 12px; }}
+    .stButton > button {{ width: 100%; min-height: 44px; }}
+}}
 </style>
 """
 
@@ -338,21 +384,18 @@ def mostrar_evento_activo(evento, key_prefix):
 
 
 # ---------------------------------------------------------
-# Menú lateral
+# Menú lateral (accesos rápidos opcionales — todo también
+# está disponible en las pestañas principales para uso móvil)
 # ---------------------------------------------------------
-st.sidebar.image("cai_security.png", width=140)
+st.sidebar.markdown(
+    '<div class="sidebar-logo">'
+    '<div class="sidebar-logo-main">C<span class="brand-accent">AI</span></div>'
+    '<div class="sidebar-logo-sub">SECUR<span class="brand-accent">IT</span>Y</div>'
+    '</div>',
+    unsafe_allow_html=True,
+)
 
-st.sidebar.caption("Apariencia")
-modo_oscuro = st.sidebar.toggle("🌙 Modo oscuro", value=(st.session_state.tema == "Oscuro"))
-st.session_state.tema = "Oscuro" if modo_oscuro else "Claro"
-
-st.sidebar.divider()
-
-seccion = st.sidebar.radio("Menú", MENU_OPCIONES)
-
-st.sidebar.divider()
-
-st.sidebar.caption("Simulaciones")
+st.sidebar.caption("Accesos rápidos")
 if st.sidebar.button("🏃 Simular movimiento sospechoso", use_container_width=True):
     activar_alerta_movimiento()
     st.rerun()
@@ -367,33 +410,54 @@ if st.sidebar.button("🧑‍💻 Simular reconocimiento facial", use_container_
 
 st.sidebar.divider()
 
-if st.sidebar.button("🔄 Reiniciar demostración", use_container_width=True):
+if st.sidebar.button("🔄 Reiniciar demostración", use_container_width=True, key="sidebar_reset"):
     reiniciar_demo()
     st.rerun()
 
 st.sidebar.caption(
-    "Este prototipo simula el funcionamiento del sistema. "
-    "No utiliza cámaras, sensores ni sustancias reales."
+    "Este prototipo simula el funcionamiento del sistema. No utiliza cámaras, "
+    "sensores ni sustancias reales. Todas las funciones también están disponibles "
+    "en las pestañas principales, sin necesidad de abrir este panel."
 )
-
-st.markdown(build_css(st.session_state.tema), unsafe_allow_html=True)
 
 # ---------------------------------------------------------
 # Encabezado
 # ---------------------------------------------------------
-st.markdown('<div class="main-title">🛡️ CAI Security</div>', unsafe_allow_html=True)
-st.markdown(
-    '<div class="subtitle">Prototipo de sistema inteligente de vigilancia para hogares y negocios</div>',
-    unsafe_allow_html=True
-)
+head_col1, head_col2 = st.columns([4, 1])
+
+with head_col2:
+    modo_oscuro = st.toggle("🌙 Oscuro", value=(st.session_state.tema == "Oscuro"), key="tema_toggle")
+    st.session_state.tema = "Oscuro" if modo_oscuro else "Claro"
+    if st.button("🔄 Reiniciar", use_container_width=True, key="header_reset"):
+        reiniciar_demo()
+        st.rerun()
+
+st.markdown(build_css(st.session_state.tema), unsafe_allow_html=True)
+
+with head_col1:
+    st.markdown(
+        '<div class="main-title">🛡️ C<span class="brand-accent">AI</span> SECUR'
+        '<span class="brand-accent">IT</span>Y</div>',
+        unsafe_allow_html=True,
+    )
+    st.markdown(
+        '<div class="subtitle">Plataforma de seguridad inteligente para hogares y negocios</div>',
+        unsafe_allow_html=True
+    )
 
 st.divider()
+
+seccion_tabs = st.tabs(MENU_OPCIONES)
+(
+    tab_panel, tab_camaras, tab_laser, tab_contramedidas,
+    tab_rostro, tab_alertas, tab_historial, tab_acerca,
+) = seccion_tabs
 
 
 # ---------------------------------------------------------
 # PANEL PRINCIPAL
 # ---------------------------------------------------------
-if seccion == "Panel principal":
+with tab_panel:
 
     col1, col2, col3, col4 = st.columns(4)
 
@@ -451,6 +515,10 @@ if seccion == "Panel principal":
             </div>
             """, unsafe_allow_html=True)
 
+    if st.button("🏃 Simular movimiento sospechoso"):
+        activar_alerta_movimiento()
+        st.rerun()
+
     st.subheader("Evento más reciente")
 
     if st.session_state.evento_activo:
@@ -469,7 +537,7 @@ if seccion == "Panel principal":
 # ---------------------------------------------------------
 # CÁMARAS
 # ---------------------------------------------------------
-elif seccion == "Cámaras":
+with tab_camaras:
 
     st.header("📹 Cámaras conectadas")
 
@@ -524,7 +592,7 @@ elif seccion == "Cámaras":
 # ---------------------------------------------------------
 # SENSORES LÁSER
 # ---------------------------------------------------------
-elif seccion == "Sensores láser":
+with tab_laser:
 
     st.header("📡 Sensores de barrera láser")
 
@@ -566,7 +634,7 @@ elif seccion == "Sensores láser":
 # ---------------------------------------------------------
 # CONTRAMEDIDAS
 # ---------------------------------------------------------
-elif seccion == "Contramedidas":
+with tab_contramedidas:
 
     st.header("🌫️ Sistema de disuasión no letal (simulado)")
 
@@ -622,7 +690,7 @@ elif seccion == "Contramedidas":
 # ---------------------------------------------------------
 # RECONOCIMIENTO FACIAL
 # ---------------------------------------------------------
-elif seccion == "Reconocimiento facial":
+with tab_rostro:
 
     st.header("🧑‍💻 Reconocimiento facial (IA simulada)")
 
@@ -665,7 +733,7 @@ elif seccion == "Reconocimiento facial":
 # ---------------------------------------------------------
 # ALERTAS
 # ---------------------------------------------------------
-elif seccion == "Alertas":
+with tab_alertas:
 
     st.header("🚨 Centro de alertas")
 
@@ -688,14 +756,14 @@ elif seccion == "Alertas":
 # ---------------------------------------------------------
 # HISTORIAL
 # ---------------------------------------------------------
-elif seccion == "Historial":
+with tab_historial:
 
     st.header("🕒 Historial de eventos")
 
     if len(st.session_state.historial) == 0:
         st.info(
-            "Todavía no hay eventos. Use los botones de simulación en el menú "
-            "lateral para iniciar la demostración."
+            "Todavía no hay eventos. Use los botones de simulación disponibles "
+            "en cada pestaña (o en el panel lateral) para iniciar la demostración."
         )
     else:
         for evento in st.session_state.historial:
@@ -705,7 +773,7 @@ elif seccion == "Historial":
 # ---------------------------------------------------------
 # ACERCA DEL PROTOTIPO
 # ---------------------------------------------------------
-elif seccion == "Acerca del prototipo":
+with tab_acerca:
 
     st.header("ℹ️ Acerca del prototipo")
 
